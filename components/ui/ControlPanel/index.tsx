@@ -4,17 +4,26 @@ import IconBtn from "../IconBtn";
 import { FontAwesome } from "@expo/vector-icons";
 
 type ControlPanelProps = {
-    controlEvent: {
+    controlEvent?: {
         forward: () => void;
         back: () => void;
         left: () => void;
         right: () => void;
     }
-    
+
 }
 
 
-export default function ControlPanel() {
+export default function ControlPanel(
+    { 
+        controlEvent = {
+            forward: () => console.log("Forward"),
+            back: () => console.log("Back"),
+            left: () => console.log("Left"),
+            right: () => console.log("Right"),
+        } 
+ }: ControlPanelProps
+) {
     const icons = {
         left: <FontAwesome name="chevron-left" size={24} color="black" />,
         right: <FontAwesome name="chevron-right" size={24} color="black" />,
@@ -33,7 +42,7 @@ export default function ControlPanel() {
             }}>
                 <IconBtn 
                     icon={icons.forward}
-                    onPress={() => console.log("Forward")}
+                    onPress={controlEvent.forward}
                 />
             </View>
             <View style={{
@@ -47,11 +56,11 @@ export default function ControlPanel() {
             }}>
                 <IconBtn 
                     icon={icons.left}
-                    onPress={() => console.log("Left")}
+                    onPress={controlEvent.left}
                 />
                 <IconBtn 
                     icon={icons.right}
-                    onPress={() => console.log("Right")}
+                    onPress={controlEvent.right}
                 />
             </View>
             
@@ -63,7 +72,7 @@ export default function ControlPanel() {
             }}>
                 <IconBtn 
                     icon={icons.back}
-                    onPress={() => console.log("Back")}
+                    onPress={controlEvent.back}
                 />
             </View>
         </View>

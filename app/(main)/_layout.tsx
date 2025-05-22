@@ -25,6 +25,13 @@ export default function TabLayout() {
             tabBarIcon: () => (<FontAwesome name="clock-o" size={24} color="black" />),
             }}
         />
+        <Tabs.Screen
+            name="test"
+            options={{
+            title: "Test",
+            tabBarIcon: () => (<FontAwesome name="expeditedssl" size={24} color="black" />),
+            }}
+        />
     </Tabs>
   );
 }
