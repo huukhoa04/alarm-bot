@@ -20,7 +20,7 @@ export default function HomeScreen() {
             <Option 
                 title="Control"
                 description="Control the mini car"
-                icon={<FontAwesome name="home" size={48} color="black" />}
+                icon={<FontAwesome name="compass" size={48} color="black" />}
                 onPress={() => handleNavigate("control")}
             />
             <Option 

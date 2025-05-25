@@ -1,6 +1,6 @@
 import { supabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
-import { Text } from "react-native";
+import { ScrollView, Text } from "react-native";
 
 export default function TestScreen() {
     const [data, setData] = useState<any>(null);
@@ -19,6 +19,7 @@ export default function TestScreen() {
     }, [])  
     return (
         <>
+        <ScrollView>
             <Text
                 style={{
                     fontSize: 24,
@@ -29,7 +30,8 @@ export default function TestScreen() {
             >Test Screen</Text>
             <Text>{
                 !loading == false && JSON.stringify(data)
-                }</Text>
+            }</Text>
+        </ScrollView>
         </>
     )
 }

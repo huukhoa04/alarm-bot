@@ -1,7 +1,7 @@
 import Button from "@/components/ui/Button";
 import ControlPanel from "@/components/ui/ControlPanel";
+import Loading from "@/components/ui/Loading";
 import VideoFeed from "@/components/ui/VideoFeed";
-import ASSETS from "@/constants/assets";
 import config from "@/constants/config";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -43,11 +43,16 @@ export default function ControlScreen() {
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
         >
+            {loading && <Loading />}
+            
             {
                 connected &&
-                <VideoFeed 
-                    videoFeed={config.CAMERA}
-                />
+                <>
+                    <VideoFeed 
+                        videoFeed={config.CAMERA}
+                    />
+                    <ControlPanel />
+                </>
             }
             <Button 
                 title={connected ? "Disconnect" : "Connect to Mini Car"}
@@ -61,7 +66,6 @@ export default function ControlScreen() {
                 onPress={() => router.push("/control/stats")}
                 style={{ backgroundColor: '#00f' }}
             />
-            <ControlPanel />
         </ScrollView>
     )
 }
