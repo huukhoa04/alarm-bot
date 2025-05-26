@@ -1,3 +1,4 @@
+#IMPORTANT NOTE: This Dockerfile is not yet correctly configured for Expo development.
 FROM node:20-slim
 
 WORKDIR /app

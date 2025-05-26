@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
   content: {
     // width: "100%",
     display: "flex",
+    flexShrink: 1,
     // borderColor: "#ccc",
     // borderWidth: 1,
     flexDirection: "column",

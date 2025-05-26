@@ -1,9 +1,11 @@
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useRef, useState } from 'react';
 
 interface WebSocketContextType {
   socket: WebSocket | null;
   isConnected: boolean;
   error: string | null;
+  disconnect: () => void;
+  connectWebSocket: () => void;
   sendMessage: (message: string) => void;
   reconnect: () => void;
 }
@@ -16,14 +18,16 @@ interface WebSocketProviderProps {
 }
 
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, url }) => {
-  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const socketRef = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const connectWebSocket = () => {
     try {
       const ws = new WebSocket(url);
-      
+      console.log('Connecting to WebSocket:', url);
+      socketRef.current = ws;
+
       ws.onopen = () => {
         console.log('WebSocket connected');
         setIsConnected(true);
@@ -38,7 +42,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
       ws.onclose = () => {
         console.log('WebSocket disconnected');
         setIsConnected(false);
-        setSocket(null);
+        socketRef.current = null;
       };
 
       ws.onerror = (error) => {
@@ -46,42 +50,43 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
         setError('WebSocket connection error');
       };
 
-      setSocket(ws);
     } catch (err) {
       setError('Failed to create WebSocket connection');
     }
   };
 
   const sendMessage = (message: string) => {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(message);
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(message);
+      console.log('Message sent:', message);
     } else {
-      console.warn('WebSocket is not connected');
+      console.warn('WebSocket is not connected. ReadyState:', socketRef.current?.readyState);
+      setError('Cannot send message: WebSocket not connected');
     }
   };
 
   const reconnect = () => {
-    if (socket) {
-      socket.close();
+    if (socketRef.current) {
+      socketRef.current.close();
     }
     connectWebSocket();
   };
 
-  useEffect(() => {
-    connectWebSocket();
-
-    return () => {
-      if (socket) {
-        socket.close();
-      }
-    };
-  }, [url]);
+  const disconnect = () => {
+    if (socketRef.current) {
+      socketRef.current.close();
+      socketRef.current = null;
+      setIsConnected(false);
+    }
+  }
 
   const value = {
-    socket,
+    socket: socketRef.current,
     isConnected,
     error,
+    disconnect,
     sendMessage,
+    connectWebSocket,
     reconnect,
   };
 

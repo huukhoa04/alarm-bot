@@ -1,50 +1,60 @@
-# Welcome to your Expo app 👋
+# MiniCar Control App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile application for controlling a remote mini car with real-time video streaming and session history tracking.
 
-## Get started
+## Features
 
-1. Install dependencies
+- Remote control interface for the mini car
+- Live video streaming from the car's camera
+- Session history tracking
+- Real-time statistics monitoring
+
+## Prerequisites
+
+- Node.js (version 20 or later)
+- Expo CLI
+- Supabase account (for backend services)
+
+## Setup Instructions
+
+1. Clone the repository
+2. Install dependencies
 
    ```bash
    npm install
    ```
+3. Environment Setup
 
-2. Start the app
+   Run this command for setup environment file:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Then reconfig your `EXPO_PUBLIC_WEBSOCKET` and `EXPO_PUBLIC_CAMERA_URL` to match your WebSocket Server and Camera Server URL
+
+4. Start the app
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+## Docker Setup
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+You can also run the app using Docker:
 
 ```bash
-npm run reset-project
+# Build the Docker image
+docker build -t minicar-control-app .
+
+# Run the Docker container
+docker run -p 19000:19000 -p 19001:19001 -p 19002:19002 minicar-control-app
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Project Structure
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- `app/` - Main application code with file-based routing
+- `components/` - Reusable UI components
+- `constants/` - Configuration files
+- `utils/` - Utility functions
+- `contexts/` - React context providers

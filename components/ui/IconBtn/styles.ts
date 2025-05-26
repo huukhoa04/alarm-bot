@@ -16,6 +16,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.5,
   },
+  pressed: {
+    opacity: 0.7,
+    backgroundColor: "gray",
+  },
 });
 
 export default styles;

@@ -1,37 +1,89 @@
+import Button from "@/components/ui/Button";
+import ASSETS from "@/constants/assets";
 import { supabase } from "@/utils/supabase";
-import { useEffect, useState } from "react";
+import { useAudioPlayer } from 'expo-audio';
+import { useState } from "react";
 import { ScrollView, Text } from "react-native";
 
 export default function TestScreen() {
-    const [data, setData] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const fetchData = async () => {
-        setLoading(true);
-        const data = await supabase.from("messages").select("*");
-        console.log(data.data);
-        setData(data);
+  const [error, setError] = useState<any>(null);
+  const player = useAudioPlayer(ASSETS.warning); 
+  const addNewItem = async () => {
+    const randomNumber = (multiplier?: number) => {
+      return Math.floor(Math.random() * (multiplier ?? 100));
     }
-    useEffect(() => {
-        fetchData();
-        return () => {
-            setLoading(false);
+    const { data, error } = await supabase
+    .from('sessions')
+    .insert([
+      {
+        stats: {
+          temperature: [
+            { value: randomNumber(), dataPointText: randomNumber().toString(), timeStamp: new Date().toLocaleTimeString() },
+            { value: randomNumber(), dataPointText: randomNumber().toString(), timeStamp: new Date().toLocaleTimeString() },
+            { value: randomNumber(), dataPointText: randomNumber().toString(), timeStamp: new Date().toLocaleTimeString() },
+            { value: randomNumber(), dataPointText: randomNumber().toString(), timeStamp: new Date().toLocaleTimeString() },
+          ],
+          humidity: [
+            { value: randomNumber(), dataPointText: randomNumber().toString(), timeStamp: new Date().toLocaleTimeString() },
+            { value: randomNumber(), dataPointText: randomNumber().toString(), timeStamp: new Date().toLocaleTimeString() },
+            { value: randomNumber(), dataPointText: randomNumber().toString(), timeStamp: new Date().toLocaleTimeString() },
+            { value: randomNumber(), dataPointText: randomNumber().toString(), timeStamp: new Date().toLocaleTimeString() },
+          ],
+          gasPressure: [
+            { value: randomNumber(1337), dataPointText: randomNumber(1337).toString(), timeStamp: new Date().toLocaleTimeString() },
+            { value: randomNumber(1337), dataPointText: randomNumber(1337).toString(), timeStamp: new Date().toLocaleTimeString() },
+            { value: randomNumber(1337), dataPointText: randomNumber(1337).toString(), timeStamp: new Date().toLocaleTimeString() },
+            { value: randomNumber(1337), dataPointText: randomNumber(1337).toString(), timeStamp: new Date().toLocaleTimeString() },
+          ],
         }
-    }, [])  
-    return (
-        <>
-        <ScrollView>
-            <Text
-                style={{
-                    fontSize: 24,
-                    fontWeight: "bold",
-                    textAlign: "left",
-                    marginVertical: 20,
-                }}
-            >Test Screen</Text>
-            <Text>{
-                !loading == false && JSON.stringify(data)
-            }</Text>
-        </ScrollView>
-        </>
-    )
+      }
+    ])
+    .select();
+    if (error) setError(error);
+    console.log("New item added:", data);
+  }
+  return (
+    <>
+      <ScrollView
+        contentContainerStyle={{
+          display: "flex",
+          gap: 8,
+          paddingHorizontal: 16,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 24,
+            fontWeight: "bold",
+            textAlign: "left",
+            marginVertical: 20,
+            marginHorizontal: "auto",
+          }}
+        >
+          Test Screen
+        </Text>
+        <Button 
+          title="Add new item"
+          onPress={addNewItem}
+          style={{
+            backgroundColor: "#007AFF",
+          }}
+        /> 
+        <Button 
+          title="Test Warning Sound"
+          onPress={() => player.play()}
+          style={{
+            backgroundColor: "#ff0000",
+          }}
+        />
+        {
+          error && (
+            <Text style={{ color: "red", textAlign: "center", marginTop: 20 }}>
+              Error: {error.message}
+            </Text>
+          )
+        }
+      </ScrollView>
+    </>
+  );
 }
