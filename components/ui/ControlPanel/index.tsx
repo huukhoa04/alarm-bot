@@ -1,5 +1,5 @@
 import { FontAwesome } from "@expo/vector-icons";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import IconBtn from "../IconBtn";
 import styles from "./styles";
 
@@ -9,6 +9,7 @@ type ControlPanelProps = {
     back: () => void;
     left: () => void;
     right: () => void;
+    stop: () => void; // Optional stop function
   };
 };
 
@@ -18,6 +19,7 @@ export default function ControlPanel({
     back: () => console.log("Back"),
     left: () => console.log("Left"),
     right: () => console.log("Right"),
+    stop: () => console.log("Stop"), // Default stop function
   },
 }: ControlPanelProps) {
   const icons = {
@@ -36,7 +38,11 @@ export default function ControlPanel({
           alignItems: "center",
         }}
       >
-        <IconBtn icon={icons.forward} onPress={controlEvent.forward} />
+        <IconBtn
+          icon={icons.forward}
+          onStop={controlEvent.stop}
+          onPress={controlEvent.forward}
+        />
       </View>
       <View
         style={{
@@ -49,8 +55,16 @@ export default function ControlPanel({
           paddingHorizontal: 8,
         }}
       >
-        <IconBtn icon={icons.left} onPress={controlEvent.left} />
-        <IconBtn icon={icons.right} onPress={controlEvent.right} />
+        <IconBtn
+          icon={icons.left}
+          onPress={controlEvent.left}
+          onStop={controlEvent.stop} // Optional stop function
+        />
+        <IconBtn
+          icon={icons.right}
+          onStop={controlEvent.stop}
+          onPress={controlEvent.right}
+        />
       </View>
 
       <View
@@ -61,7 +75,11 @@ export default function ControlPanel({
           justifyContent: "center",
         }}
       >
-        <IconBtn icon={icons.back} onPress={controlEvent.back} />
+        <IconBtn
+          icon={icons.back}
+          onStop={controlEvent.stop}
+          onPress={controlEvent.back}
+        />
       </View>
     </View>
   );

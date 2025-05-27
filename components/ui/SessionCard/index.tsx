@@ -6,12 +6,10 @@ import { Pressable, Text, View } from "react-native";
 import styles from "./styles";
 
 interface SessionCardProps {
-  sessionItem: SessionItem
+  sessionItem: SessionItem;
 }
 
-export default function SessionCard(
-  { sessionItem }: SessionCardProps
-) {
+export default function SessionCard({ sessionItem }: SessionCardProps) {
   const router = useRouter();
   return (
     <>
@@ -29,7 +27,8 @@ export default function SessionCard(
         </View>
         <View style={styles.content}>
           <Text style={styles.title}>
-            <FontAwesome name="calendar" size={15} color="black" /> {dateFormat(sessionItem.created_at)}
+            <FontAwesome name="calendar" size={15} color="black" />{" "}
+            {dateFormat(sessionItem.created_at)}
           </Text>
           <Text style={styles.description}>
             This is a brief description of the session.

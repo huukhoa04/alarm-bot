@@ -24,40 +24,45 @@ export default function StatsScreen() {
       toast.show("No data to add to Supabase.", "info");
       return;
     }
-    const { data, error } = await supabase.from("sessions")
-    .insert([
+    const { data, error } = await supabase.from("sessions").insert([
       {
         stats: {
           temperature: toSensorItems(lineData),
           humidity: toSensorItems(lineData),
           gasPressure: toSensorItems(lineData),
-        }
-      }
+        },
+      },
     ]);
     if (error) {
-      toast.show(
-        "Error adding data to Supabase: " + error.message,
-        "error"
-      );
+      toast.show("Error adding data to Supabase: " + error.message, "error");
       console.error("Error adding data to Supabase:", error);
       return;
     }
     toast.show("Data added to Supabase successfully!", "success");
-  }
+  };
   useEffect(() => {
     let interval: number | null = null;
 
     if (isConnected && socket) {
       console.log("WebSocket connected from StatsScreen");
       setLoading(false);
-      
-      // Set up message handler
+
+      // DON'T override the message handler - use a custom event system instead
+      // Store the original handler and add our own logic
+      const originalOnMessage = socket.onmessage;
       socket.onmessage = (event) => {
-        console.log("StatsScreen received:", event.data);
+        // Call original handler first
+        if (originalOnMessage) {
+          originalOnMessage.call(socket, event);
+        }
+
+        // Then handle our specific logic
+        console.log("StatsScreen received:", event);
         try {
           const data = JSON.parse(event.data);
-          // Handle real sensor data here if needed
-          // setFlameDetected(data.flameDetected);
+          if (data.flameDetected !== undefined) {
+            setFlameDetected(data.flameDetected);
+          }
         } catch (err) {
           console.error("Error parsing WebSocket data:", err);
         }
@@ -76,15 +81,14 @@ export default function StatsScreen() {
           return [...prevData, newDataPoint].slice(-20); // Keep last 20 data points
         });
       }, 2000);
-
     } else if (error) {
       setLoading(false);
-      console.error("WebSocket error:", error);
+      console.error("WebSocket error from StatsScreen:", error);
     } else {
       setLoading(true);
     }
 
-    // Cleanup interval on disconnect or unmount
+    // Cleanup
     return () => {
       if (interval) {
         clearInterval(interval);
@@ -94,19 +98,17 @@ export default function StatsScreen() {
 
   // Handle disconnection and data saving
   useEffect(() => {
-    if (isConnected === false) {
+    // Only save when we transition from connected to disconnected AND have data
+    if (isConnected === false && lineData.length > 0) {
       console.log("WebSocket disconnected, saving data...");
       setFlameDetected(false);
-      
-      // Save data to Supabase if we have collected data
-      if (lineData.length > 0) {
-        addToSupabase();
-      }
-      
-      // Clear data for next session
-      setLineData([]);
+      addToSupabase();
+      // Clear data after a delay to ensure save completes
+      setTimeout(() => {
+        setLineData([]);
+      }, 1000);
     }
-  }, [isConnected, lineData.length]); // Include lineData.length to ensure we have current data
+  }, [isConnected]); // Remove lineData.length dependency to avoid infinite loops
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>

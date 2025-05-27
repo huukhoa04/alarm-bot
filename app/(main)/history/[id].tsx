@@ -18,36 +18,35 @@ export default function SessionDetail() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<any>(null);
   const [data, setData] = useState<SessionItem | null>(null);
-  const onRefresh = useCallback(async () => {
-    setLoading(true);
-
-    await fetchData();
-    setLoading(false);
-
-  }, []);
-
-  useEffect(() => {
-    setLoading(true);
-
-    fetchData();
-    setLoading(false);
-
-  }, []);
-
+  
   const fetchData = async () => {
-    const {data, error} = await supabase.from('sessions')
-    .select('*')
-    .eq('id', id)
-    .single();
+    const { data, error } = await supabase
+      .from("sessions")
+      .select("*")
+      .eq("id", id)
+      .single();
     if (error) {
       console.error("Error fetching session data:", error);
       setError(error);
       return;
     }
     setData(data);
-  }
+  };
+  const onRefresh = useCallback(async () => {
+    setLoading(true);
 
+    await fetchData();
+    setLoading(false);
+  }, [fetchData]);
 
+  useEffect(() => {
+    setLoading(true);
+
+    fetchData();
+    setLoading(false);
+  }, [fetchData]);
+
+  
 
   return (
     <>
@@ -65,17 +64,15 @@ export default function SessionDetail() {
           />
         }
       >
-        {
-          error && (
-            <Text style={{ color: "red", textAlign: "center", marginTop: 20 }}>
-              Error fetching session data: {error.message}
-            </Text>
-          )
-        }
-        {(loading === false && data !== null) && (
+        {error && (
+          <Text style={{ color: "red", textAlign: "center", marginTop: 20 }}>
+            Error fetching session data: {error.message}
+          </Text>
+        )}
+        {loading === false && data !== null && (
           <>
             <Text style={{ color: "#000", fontSize: 16, fontWeight: "bold" }}>
-                Saved at: {getDate(data.created_at)} - {getTime(data.created_at)}
+              Saved at: {getDate(data.created_at)} - {getTime(data.created_at)}
             </Text>
             <View style={styles.chartContainer}>
               <Text style={{ color: "#000", fontSize: 16, fontWeight: "bold" }}>

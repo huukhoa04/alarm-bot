@@ -18,31 +18,20 @@ export default function ControlScreen() {
     disconnect,
   } = useWebSocket();
   const [loading, setLoading] = useState(false);
+  const [speed, setSpeed] = useState(100); // Example state for speed control
   const router = useRouter();
   const handleConnect = () => {
     if (isConnected) {
       console.log("Disconnecting from drone...");
-      setLoading(true);
-      setTimeout(() => {
-        disconnect();
-        setLoading(false);
-      }, 2000);
+      disconnect(); // Remove the setTimeout, call directly
       return;
     } else if (error) {
       console.log("Error occurred, attempting to reconnect...");
-      setLoading(true);
-      setTimeout(() => {
-        reconnect();
-        setLoading(false);
-      }, 2000);
+      reconnect(); // Remove the setTimeout, call directly
       return;
     } else {
       console.log("Connecting to drone...");
-      setLoading(true);
-      setTimeout(() => {
-        connectWebSocket();
-        setLoading(false);
-      }, 2000);
+      connectWebSocket(); // Remove the setTimeout, call directly
       return;
     }
   };
@@ -53,8 +42,15 @@ export default function ControlScreen() {
       back: () => sendMessage("s"),
       left: () => sendMessage("a"),
       right: () => sendMessage("d"),
+      stop: () => sendMessage("x"),
     };
   }, [isConnected]);
+
+  // useEffect(() => {
+  //   if (!isConnected) {
+  //     setSpeed(100); // Reset speed when disconnected
+  //   }
+  // }, [isConnected]);
 
   return (
     <ScrollView
@@ -76,7 +72,25 @@ export default function ControlScreen() {
       {isConnected && (
         <>
           <VideoFeed videoFeed={config.CAMERA} />
-          <Text style={{ fontSize: 16, fontWeight: "bold", width: "100%", textAlign: "center", marginBottom: 16 }}>
+          {/* <CustomSlider 
+            label="Speed Control"
+            value={speed}
+            onValueChange={(value) => setSpeed(value)}
+            onSlidingComplete={(value) => sendMessage(`SPEED:${value}`)}
+            minimumValue={0}
+            maximumValue={150}
+            minimumTrackTintColor="#1f2"
+            maximumTrackTintColor="#ccc"
+          /> */}
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "bold",
+              width: "100%",
+              textAlign: "center",
+              marginBottom: 16,
+            }}
+          >
             HOLD the buttons to control the mini car
           </Text>
           <ControlPanel controlEvent={controlEvent} />

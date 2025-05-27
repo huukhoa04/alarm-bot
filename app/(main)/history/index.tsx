@@ -10,18 +10,17 @@ export default function HistoryScreen() {
   const [data, setData] = useState<SessionItem[]>([]);
   const fetchHistoryData = useCallback(async () => {
     let { data: sessions, error } = await supabase
-      .from('sessions')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("sessions")
+      .select("*")
+      .order("created_at", { ascending: false });
     if (error) {
       console.error("Error fetching history data:", error);
       setError(error);
       return;
     }
     setData(sessions || []);
-
   }, []);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -53,11 +52,12 @@ export default function HistoryScreen() {
           />
         }
       >
-        {
-          loading === false && 
+        {loading === false && (
           <>
             {error && (
-              <Text style={{ color: "red", textAlign: "center", marginTop: 20 }}>
+              <Text
+                style={{ color: "red", textAlign: "center", marginTop: 20 }}
+              >
                 Error fetching history data: {error.message}
               </Text>
             )}
@@ -71,8 +71,7 @@ export default function HistoryScreen() {
               </Text>
             )}
           </>
-        }
-              
+        )}
       </ScrollView>
     </>
   );

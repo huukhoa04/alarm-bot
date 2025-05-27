@@ -6,17 +6,12 @@ type VideoFeedProps = {
   capture?: () => void;
 };
 
-export default function VideoFeed(
-  { 
-    videoFeed, 
-    capture = () => {
-      console.log("Capture button pressed");
-    } 
-  }: VideoFeedProps) {
-  const handleCapture = () => {
+export default function VideoFeed({
+  videoFeed,
+  capture = () => {
     console.log("Capture button pressed");
-    capture();
-  }
+  },
+}: VideoFeedProps) {
   return (
     <>
       {/* <VideoView
@@ -37,7 +32,7 @@ export default function VideoFeed(
             /> */}
       <View
         style={{
-          position: 'relative',
+          position: "relative",
           // width: "auto",
           width: "100%",
           height: 200,
