@@ -5,6 +5,8 @@ import { FontAwesome } from "@expo/vector-icons";
 type ButtonProps = {
     title: string;
     onPress: () => void;
+    onPressIn?: () => void;
+    onPressOut?: () => void;
     style?: object;
     disabled?: boolean;
     loading?: boolean;
@@ -16,6 +18,8 @@ export default function Button(
     { 
         title, 
         onPress, 
+        onPressIn,
+        onPressOut,
         style = [], 
         disabled = false, 
         loading = false, 
@@ -24,7 +28,13 @@ export default function Button(
     }: ButtonProps
 ){   
     return (
-        <Pressable style={[styles.container, style]} onPress={onPress} disabled={disabled}>
+        <Pressable 
+            style={[styles.container, style]} 
+            onPress={onPress}
+            onPressIn={onPressIn}
+            onPressOut={onPressOut}
+            disabled={disabled}
+        >
             {icon && iconPosition === "left" && <View style={styles.icon}>{icon}</View>}
             {loading && <FontAwesome name="spinner" size={24} color="white" />}
             <Text style={styles.title}>{title}</Text>

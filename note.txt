@@ -1,0 +1,19 @@
+# Chạy development server
+npm start
+# hoặc
+npx expo start
+
+# Chạy trên Android emulator
+npm run android
+# hoặc
+npx expo start --android
+
+# Chạy trên iOS simulator (chỉ trên macOS)
+npm run ios
+# hoặc
+npx expo start --ios
+
+# Chạy trên web browser
+npm run web
+# hoặc
+npx expo start --web
