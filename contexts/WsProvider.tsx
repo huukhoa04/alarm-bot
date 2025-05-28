@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useContext, useRef, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useRef, useState, useEffect } from 'react';
 
 interface WebSocketContextType {
   socket: WebSocket | null;
@@ -20,11 +20,40 @@ interface WebSocketProviderProps {
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, url }) => {
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<number | null>(null);
-  const shouldReconnectRef = useRef<boolean>(true); // Add this ref
+  const pingIntervalRef = useRef<number | null>(null); // Add ping interval ref
+  const shouldReconnectRef = useRef<boolean>(true);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
   const maxReconnectAttempts = 5;
+
+  // Setup ping interval when connection status changes
+  useEffect(() => {
+    // Clear any existing ping interval
+    if (pingIntervalRef.current) {
+      clearInterval(pingIntervalRef.current);
+      pingIntervalRef.current = null;
+    }
+
+    // Start ping interval if connected
+    if (isConnected && socketRef.current) {
+      console.log('Starting ping interval');
+      pingIntervalRef.current = setInterval(() => {
+        if (socketRef.current?.readyState === WebSocket.OPEN) {
+          socketRef.current.send(JSON.stringify({ type: 'ping' }));
+          console.log('Ping sent to server');
+        }
+      }, 2000);
+    }
+
+    // Cleanup on unmount or when connection changes
+    return () => {
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current);
+        pingIntervalRef.current = null;
+      }
+    };
+  }, [isConnected]);
 
   const connectWebSocket = () => {
     // Clear any existing reconnection timeout
@@ -96,6 +125,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
     }
+
+    // Clear ping interval
+    if (pingIntervalRef.current) {
+      clearInterval(pingIntervalRef.current);
+      pingIntervalRef.current = null;
+    }
     
     if (socketRef.current) {
       socketRef.current.close(1000, 'Manual disconnect'); // Clean close
@@ -125,20 +160,24 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
     }
   };
 
-  // // Auto-connect on mount
-  // useEffect(() => {
-  //   connectWebSocket();
-    
-  //   return () => {
-  //     shouldReconnectRef.current = false; // Disable reconnection on unmount
-  //     if (reconnectTimeoutRef.current) {
-  //       clearTimeout(reconnectTimeoutRef.current);
-  //     }
-  //     if (socketRef.current) {
-  //       socketRef.current.close();
-  //     }
-  //   };
-  // }, []);
+  // Clean up on component unmount
+  useEffect(() => {
+    return () => {
+      shouldReconnectRef.current = false;
+      
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current);
+      }
+      
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
+    };
+  }, []);
 
   const value = {
     socket: socketRef.current,
