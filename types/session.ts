@@ -17,6 +17,11 @@ export type SessionItem = {
       dataPointText: string;
       timeStamp: string;
     }[];
+    firePressure: {
+      value: number;
+      dataPointText: string;
+      timeStamp: string;
+    }[]
   };
 };
 

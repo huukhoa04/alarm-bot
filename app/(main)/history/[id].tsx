@@ -178,6 +178,40 @@ export default function SessionDetail() {
                 curvature={1}
               />
             </View>
+            <View style={styles.chartContainer}>
+              <Text style={{ color: "#000", fontSize: 16, fontWeight: "bold" }}>
+                Fire Pressure (kPa)
+              </Text>
+              <LineChart
+                animationEasing={"easeInOut"}
+                areaChart
+                startFillColor="#FF9B17"
+                endFillColor="#FF9B17"
+                startOpacity={0.4}
+                endOpacity={0.01}
+                initialSpacing={0}
+                data={mapSensorItems(data.stats.firePressure)}
+                spacing={100}
+                textColor="black"
+                textShiftY={-8}
+                textShiftX={-10}
+                thickness={2}
+                textFontSize={13}
+                focusEnabled
+                dataPointsColor="#EA7300"
+                showStripOnFocus
+                showTextOnFocus
+                curved
+                curveType={CurveType.QUADRATIC}
+                // hideRules
+                yAxisColor="#FF9B17"
+                showVerticalLines
+                verticalLinesColor="#FFA55D"
+                xAxisColor="#FF9B17"
+                color="#FF9B17"
+                curvature={1}
+              />
+            </View>
           </>
         )}
       </ScrollView>

@@ -1,5 +1,6 @@
 import { useWebSocket } from "@/contexts/WsProvider";
 import { useToast } from "@/hooks/useToast";
+import { MappedSensorItem } from "@/types/session";
 import { toSensorItems } from "@/utils/mapSensorItems";
 import { supabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
@@ -7,39 +8,26 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { CurveType, LineChart } from "react-native-gifted-charts";
 
 export default function StatsScreen() {
-  const [lineData, setLineData] = useState<
-    {
-      value: number;
-      dataPointText: string;
-      label: string;
-    }[]
-  >([]);
+  const [liveData, setLiveData] = useState<{
+    hasFire: number;
+    hasGas: number;
+    temperature: MappedSensorItem[];
+    humidity: MappedSensorItem[];
+    gasPressure: MappedSensorItem[];
+    firePressure: MappedSensorItem[];
+  }>({
+    hasFire: 0,
+    hasGas: 0,
+    temperature: [],
+    humidity: [],
+    gasPressure: [],
+    firePressure: [],
+  }); // Initialize with an empty array
   const toast = useToast();
   const [loading, setLoading] = useState(false);
-  const [flameDetected, setFlameDetected] = useState(false);
   const { socket, isConnected, error } = useWebSocket();
 
-  const addToSupabase = async () => {
-    if (lineData.length === 0) {
-      toast.show("No data to add to Supabase.", "info");
-      return;
-    }
-    const { data, error } = await supabase.from("sessions").insert([
-      {
-        stats: {
-          temperature: toSensorItems(lineData),
-          humidity: toSensorItems(lineData),
-          gasPressure: toSensorItems(lineData),
-        },
-      },
-    ]);
-    if (error) {
-      toast.show("Error adding data to Supabase: " + error.message, "error");
-      console.error("Error adding data to Supabase:", error);
-      return;
-    }
-    toast.show("Data added to Supabase successfully!", "success");
-  };
+  
   useEffect(() => {
     let interval: number | null = null;
 
@@ -56,31 +44,25 @@ export default function StatsScreen() {
           originalOnMessage.call(socket, event);
         }
 
-        // Then handle our specific logic
-        console.log("StatsScreen received:", event);
-        try {
-          const data = JSON.parse(event.data);
-          if (data.flameDetected !== undefined) {
-            setFlameDetected(data.flameDetected);
+        console.log("WebSocket message received from StatsScreen:", event.data);
+        if (event.data.match(/SENSOR_DATA:/)) {
+          try {
+            const sensorData = JSON.parse(event.data.replace("SENSOR_DATA:", ""));
+            setLiveData(prev => ({
+              ...prev,
+              hasFire: sensorData.fire || 0,
+              hasGas: sensorData.gas || 0,
+              temperature: [...prev.temperature, { value: sensorData.temperature, dataPointText: String(sensorData.temperature), label: new Date().toLocaleTimeString() }],
+              humidity: [...prev.humidity, { value: sensorData.humidity, dataPointText: String(sensorData.humidity), label: new Date().toLocaleTimeString() }],
+              gasPressure: [...prev.gasPressure, { value: sensorData.analog1, dataPointText: String(sensorData.analog1), label: new Date().toLocaleTimeString() }],
+              firePressure: [...prev.firePressure, { value: sensorData.analog2, dataPointText: String(sensorData.analog2), label: new Date().toLocaleTimeString() }],
+            }));
+          } catch (e) {
+            console.error("Error parsing sensor data:", e);
           }
-        } catch (err) {
-          console.error("Error parsing WebSocket data:", err);
         }
       };
 
-      // Start data collection interval when connected
-      interval = setInterval(() => {
-        setLineData((prevData) => {
-          const randomValue = Math.floor(Math.random() * 100);
-          const newDataPoint = {
-            value: randomValue,
-            dataPointText: randomValue.toString() + "°C",
-            label: new Date().toLocaleTimeString(),
-          };
-
-          return [...prevData, newDataPoint].slice(-20); // Keep last 20 data points
-        });
-      }, 2000);
     } else if (error) {
       setLoading(false);
       console.error("WebSocket error from StatsScreen:", error);
@@ -96,19 +78,7 @@ export default function StatsScreen() {
     };
   }, [isConnected, socket, error]);
 
-  // Handle disconnection and data saving
-  useEffect(() => {
-    // Only save when we transition from connected to disconnected AND have data
-    if (isConnected === false && lineData.length > 0) {
-      console.log("WebSocket disconnected, saving data...");
-      setFlameDetected(false);
-      addToSupabase();
-      // Clear data after a delay to ensure save completes
-      setTimeout(() => {
-        setLineData([]);
-      }, 1000);
-    }
-  }, [isConnected]); // Remove lineData.length dependency to avoid infinite loops
+
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -130,20 +100,20 @@ export default function StatsScreen() {
           <View
             style={{
               ...styles.announceContainer,
-              backgroundColor: flameDetected ? "#ffb3b3" : "#b3ffb3",
-              borderColor: flameDetected ? "#ff0000" : "#009900",
+              backgroundColor: liveData.hasFire ? "#ffb3b3" : "#b3ffb3",
+              borderColor: liveData.hasFire ? "#ff0000" : "#009900",
               borderWidth: 2,
               borderRadius: 12,
             }}
           >
             <Text
               style={{
-                color: flameDetected ? "#ff0000" : "#009900",
+                color: liveData.hasFire ? "#ff0000" : "#009900",
                 fontSize: 20,
                 fontWeight: "bold",
               }}
             >
-              {flameDetected ? "🔥 Flame Detected!" : "✅ No Flame Detected"}
+              {liveData.hasFire ? "🔥 Flame Detected!" : "✅ No Flame Detected"}
             </Text>
           </View>
           <View style={styles.chartContainer}>
@@ -158,7 +128,7 @@ export default function StatsScreen() {
               startOpacity={0.4}
               endOpacity={0.01}
               initialSpacing={0}
-              data={lineData}
+              data={liveData.temperature.slice(-20)}
               spacing={100}
               textColor="black"
               textShiftY={-8}
@@ -193,7 +163,7 @@ export default function StatsScreen() {
               startOpacity={0.4}
               endOpacity={0.01}
               initialSpacing={0}
-              data={lineData}
+              data={liveData.humidity.slice(-20)}
               spacing={100}
               textColor="black"
               textShiftY={-8}
@@ -217,7 +187,7 @@ export default function StatsScreen() {
           </View>
           <View style={styles.chartContainer}>
             <Text style={{ color: "#000", fontSize: 16, fontWeight: "bold" }}>
-              Gas Concentration (ppm)
+              Gas Concentration
             </Text>
             <LineChart
               animationEasing={"easeInOut"}
@@ -227,7 +197,41 @@ export default function StatsScreen() {
               startOpacity={0.4}
               endOpacity={0.01}
               initialSpacing={0}
-              data={lineData}
+              data={liveData.gasPressure.slice(-20)}
+              spacing={100}
+              textColor="black"
+              textShiftY={-8}
+              textShiftX={-10}
+              thickness={2}
+              textFontSize={13}
+              focusEnabled
+              dataPointsColor="#EA7300"
+              showStripOnFocus
+              showTextOnFocus
+              curved
+              curveType={CurveType.QUADRATIC}
+              // hideRules
+              yAxisColor="#FF9B17"
+              showVerticalLines
+              verticalLinesColor="#FFA55D"
+              xAxisColor="#FF9B17"
+              color="#FF9B17"
+              curvature={1}
+            />
+          </View>
+          <View style={styles.chartContainer}>
+            <Text style={{ color: "#000", fontSize: 16, fontWeight: "bold" }}>
+              Fire Pressure
+            </Text>
+            <LineChart
+              animationEasing={"easeInOut"}
+              areaChart
+              startFillColor="#FF9B17"
+              endFillColor="#FF9B17"
+              startOpacity={0.4}
+              endOpacity={0.01}
+              initialSpacing={0}
+              data={liveData.firePressure.slice(-20)}
               spacing={100}
               textColor="black"
               textShiftY={-8}
