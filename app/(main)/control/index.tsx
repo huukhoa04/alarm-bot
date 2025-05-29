@@ -67,13 +67,48 @@ export default function ControlScreen() {
 
   const controlEvent = useMemo(() => {
     return {
-      forward: () => sendMessage("w"),
-      back: () => sendMessage("s"),
-      left: () => sendMessage("a"),
-      right: () => sendMessage("d"),
-      stop: () => sendMessage("x"),
+      forward: () => {
+        if (!isConnected) {
+          console.log("Not connected, skipping forward command");
+          return;
+        }
+        console.log("Sending forward command (w)");
+        sendMessage("w");
+      },
+      back: () => {
+        if (!isConnected) {
+          console.log("Not connected, skipping back command");
+          return;
+        }
+        console.log("Sending back command (s)");
+        sendMessage("s");
+      },
+      left: () => {
+        if (!isConnected) {
+          console.log("Not connected, skipping left command");
+          return;
+        }
+        console.log("Sending left command (a)");
+        sendMessage("a");
+      },
+      right: () => {
+        if (!isConnected) {
+          console.log("Not connected, skipping right command");
+          return;
+        }
+        console.log("Sending right command (d)");
+        sendMessage("d");
+      },
+      stop: () => {
+        if (!isConnected) {
+          console.log("Not connected, skipping stop command");
+          return;
+        }
+        console.log("Sending stop command (x)");
+        sendMessage("x");
+      },
     };
-  }, [isConnected]);
+  }, [isConnected, sendMessage]);
   const addToSupabase = async () => {
     if (liveData.temperature.length === 0) {
       toast.show("No data to add to Supabase.", "info");
@@ -195,7 +230,7 @@ export default function ControlScreen() {
               marginBottom: 16,
             }}
           >
-            HOLD the buttons to control the mini car
+            HOLD buttons to control robot (anti-spam protection)
           </Text>
           <ControlPanel controlEvent={controlEvent} />
         </>

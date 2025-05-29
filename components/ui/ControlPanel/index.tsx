@@ -42,6 +42,7 @@ export default function ControlPanel({
           icon={icons.forward}
           onStop={controlEvent.stop}
           onPress={controlEvent.forward}
+          commandType="forward"
         />
       </View>
       <View
@@ -58,12 +59,14 @@ export default function ControlPanel({
         <IconBtn
           icon={icons.left}
           onPress={controlEvent.left}
-          onStop={controlEvent.stop} // Optional stop function
+          onStop={controlEvent.stop}
+          commandType="left"
         />
         <IconBtn
           icon={icons.right}
           onStop={controlEvent.stop}
           onPress={controlEvent.right}
+          commandType="right"
         />
       </View>
 
@@ -79,6 +82,7 @@ export default function ControlPanel({
           icon={icons.back}
           onStop={controlEvent.stop}
           onPress={controlEvent.back}
+          commandType="back"
         />
       </View>
     </View>
