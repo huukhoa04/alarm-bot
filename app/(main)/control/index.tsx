@@ -143,7 +143,9 @@ export default function ControlScreen() {
         // Handle incoming messages
         if (event.data.match(/SENSOR_DATA:/)) {
           try {
+            // const receivedData = JSON.parse(event)
             const sensorData = JSON.parse(event.data.replace("SENSOR_DATA:", ""));
+            console.log("Received sensor data:", event.data.replace("SENSOR_DATA:", ""));
             setLiveData(prev => ({
               ...prev,
               temperature: [...prev.temperature, { value: sensorData.temperature, dataPointText: String(sensorData.temperature), label: new Date().toLocaleTimeString() }],
@@ -152,8 +154,8 @@ export default function ControlScreen() {
               firePressure: [...prev.firePressure, { value: sensorData.analog2, dataPointText: String(sensorData.analog2), label: new Date().toLocaleTimeString() }],
             }));
             setStatus({
-              isFire: sensorData.fire || 1,
-              hasGas: sensorData.gas || 1,
+              isFire: sensorData.fire ?? 1,
+              hasGas: sensorData.gas ?? 1,
             });
           } catch (e) {
             console.error("Error parsing sensor data:", e);
@@ -163,14 +165,14 @@ export default function ControlScreen() {
     }
   }, [isConnected, socket, error]);
   useEffect(() => {
-    if(status.isFire === 0 && status.hasGas === 0) {
+    if(status.isFire == 0 && status.hasGas == 0) {
       toast.show("🔥💨 Flame and gas detected! Please take action immediately.", "error");
     }
     else
-    if(status.isFire === 0) {
+    if(status.isFire == 0) {
       toast.show("🔥 Flame detected! Please take action.", "error");
     }
-    else if(status.hasGas === 0)
+    else if(status.hasGas == 0)
     {
       toast.show("💨 Gas detected! Please take action.", "error");
     }
@@ -221,7 +223,7 @@ export default function ControlScreen() {
             minimumTrackTintColor="#1f2"
             maximumTrackTintColor="#ccc"
           /> */}
-          <Text
+          {/* <Text
             style={{
               fontSize: 16,
               fontWeight: "bold",
@@ -231,7 +233,7 @@ export default function ControlScreen() {
             }}
           >
             HOLD buttons to control robot (anti-spam protection)
-          </Text>
+          </Text> */}
           <ControlPanel controlEvent={controlEvent} />
         </>
       )}

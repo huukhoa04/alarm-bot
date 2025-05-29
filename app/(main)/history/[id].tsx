@@ -106,7 +106,7 @@ export default function SessionDetail() {
                 xAxisColor="#F44336"
                 color="#F44336"
                 curvature={1}
-                maxValue={100}
+                // maxValue={100}
               />
             </View>
             <View style={styles.chartContainer}>
@@ -141,12 +141,12 @@ export default function SessionDetail() {
                 xAxisColor="#648DB3"
                 color="#648DB3"
                 curvature={1}
-                maxValue={100}
+                // maxValue={100}
               />
             </View>
             <View style={styles.chartContainer}>
               <Text style={{ color: "#000", fontSize: 16, fontWeight: "bold" }}>
-                Gas Concentration
+                Gas Sensor Analog Value
               </Text>
               <LineChart
                 animationEasing={"easeInOut"}
@@ -180,7 +180,7 @@ export default function SessionDetail() {
             </View>
             <View style={styles.chartContainer}>
               <Text style={{ color: "#000", fontSize: 16, fontWeight: "bold" }}>
-                Fire Pressure
+                Fire Sensor Analog Value
               </Text>
               <LineChart
                 animationEasing={"easeInOut"}

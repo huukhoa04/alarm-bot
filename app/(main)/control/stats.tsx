@@ -1,5 +1,4 @@
 import { useWebSocket } from "@/contexts/WsProvider";
-import { useToast } from "@/hooks/useToast";
 import { MappedSensorItem } from "@/types/session";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -41,14 +40,14 @@ export default function StatsScreen() {
           originalOnMessage.call(socket, event);
         }
 
-        console.log("WebSocket message received from StatsScreen:", event.data);
+        console.log("WebSocket message received from StatsScreen:", event["data"]);
         if (event.data.match(/SENSOR_DATA:/)) {
           try {
             const sensorData = JSON.parse(event.data.replace("SENSOR_DATA:", ""));
             setLiveData(prev => ({
               ...prev,
-              hasFire: sensorData.fire || 1,
-              hasGas: sensorData.gas || 1,
+              hasFire: sensorData.fire ?? 1,
+              hasGas: sensorData.gas ?? 1,
               temperature: [...prev.temperature, { value: sensorData.temperature, dataPointText: String(sensorData.temperature), label: new Date().toLocaleTimeString() }],
               humidity: [...prev.humidity, { value: sensorData.humidity, dataPointText: String(sensorData.humidity), label: new Date().toLocaleTimeString() }],
               gasPressure: [...prev.gasPressure, { value: sensorData.analog1, dataPointText: String(sensorData.analog1), label: new Date().toLocaleTimeString() }],
@@ -97,21 +96,21 @@ export default function StatsScreen() {
           <View
             style={{
               ...styles.announceContainer,
-              backgroundColor: liveData.hasFire === 0 || liveData.hasGas === 0 ? "#ffb3b3" : "#b3ffb3",
-              borderColor: liveData.hasFire === 0 || liveData.hasGas === 0 ? "#ff0000" : "#009900",
+              backgroundColor: liveData.hasFire == 0 || liveData.hasGas == 0 ? "#ffb3b3" : "#b3ffb3",
+              borderColor: liveData.hasFire == 0 || liveData.hasGas == 0 ? "#ff0000" : "#009900",
               borderWidth: 2,
               borderRadius: 12,
             }}
           >
             <Text
               style={{
-                color: liveData.hasFire === 0 || liveData.hasGas === 0 ? "#ff0000" : "#009900",
+                color: liveData.hasFire == 0 || liveData.hasGas == 0 ? "#ff0000" : "#009900",
                 fontSize: 20,
                 fontWeight: "bold",
               }}
             >
-              {liveData.hasFire === 0 ? "🔥 Flame Detected!" : "✅ No Flame Detected"}
-              {liveData.hasGas === 0 ? " 💨 Gas Detected!" : "✅ No Gas Detected"}
+              {liveData.hasFire == 0 ? "🔥 Flame Detected!" : "✅ No Flame Detected"}
+              {liveData.hasGas == 0 ? " 💨 Gas Detected!" : "✅ No Gas Detected"}
             </Text>
           </View>
           <View style={styles.chartContainer}>
@@ -185,7 +184,7 @@ export default function StatsScreen() {
           </View>
           <View style={styles.chartContainer}>
             <Text style={{ color: "#000", fontSize: 16, fontWeight: "bold" }}>
-              Gas Concentration
+              Gas Sensor Analog Value
             </Text>
             <LineChart
               animationEasing={"easeInOut"}
@@ -219,7 +218,7 @@ export default function StatsScreen() {
           </View>
           <View style={styles.chartContainer}>
             <Text style={{ color: "#000", fontSize: 16, fontWeight: "bold" }}>
-              Fire Pressure
+              Fire Sensor Analog Value
             </Text>
             <LineChart
               animationEasing={"easeInOut"}
