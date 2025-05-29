@@ -32,29 +32,35 @@ A mobile application for controlling a remote mini car with real-time video stre
    ```
 
    Then reconfig your `EXPO_PUBLIC_WEBSOCKET` and `EXPO_PUBLIC_CAMERA_URL` to match your WebSocket Server and Camera Server URL
-
 4. Start the app
 
    ```bash
    npx expo start
    ```
 
-## Docker Setup
+## Hardware setup
 
-You can also run the app using Docker:
 
-```bash
-# Build the Docker image
-docker build -t minicar-control-app .
+### Requirements
 
-# Run the Docker container
-docker run -p 19000:19000 -p 19001:19001 -p 19002:19002 minicar-control-app
-```
+- 1x AI Thinker ESP32 Cam
+- 1x Arduino Uno R3
+- 1x DHT22 Temperature Humidity Sensor
+- 1x MQ2 Gas/Smoke Sensor
+- 1x KY-026 Flame Sensor
+- Wires
+- Batteries
 
-## Project Structure
+Datasheet:
 
-- `app/` - Main application code with file-based routing
-- `components/` - Reusable UI components
-- `constants/` - Configuration files
-- `utils/` - Utility functions
-- `contexts/` - React context providers
+![img](assets/images/datasheet.png)
+
+### Setting up
+
+1. Navigate to [main esp32 file](arduino/esp32control.ino)
+2. change hotspot wifi and password to match your desired wifi credentials
+   ```c
+   // Thông tin WiFi
+   const char* ssid = "your_wifi_ssid";  
+   const char* password = "your_wifi_password"; 
+   ```

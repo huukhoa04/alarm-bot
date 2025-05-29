@@ -146,7 +146,7 @@ export default function SessionDetail() {
             </View>
             <View style={styles.chartContainer}>
               <Text style={{ color: "#000", fontSize: 16, fontWeight: "bold" }}>
-                Gas Concentration (ppm)
+                Gas Concentration
               </Text>
               <LineChart
                 animationEasing={"easeInOut"}
@@ -180,7 +180,7 @@ export default function SessionDetail() {
             </View>
             <View style={styles.chartContainer}>
               <Text style={{ color: "#000", fontSize: 16, fontWeight: "bold" }}>
-                Fire Pressure (kPa)
+                Fire Pressure
               </Text>
               <LineChart
                 animationEasing={"easeInOut"}
