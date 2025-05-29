@@ -1,8 +1,6 @@
 import { useWebSocket } from "@/contexts/WsProvider";
 import { useToast } from "@/hooks/useToast";
 import { MappedSensorItem } from "@/types/session";
-import { toSensorItems } from "@/utils/mapSensorItems";
-import { supabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { CurveType, LineChart } from "react-native-gifted-charts";
@@ -16,14 +14,13 @@ export default function StatsScreen() {
     gasPressure: MappedSensorItem[];
     firePressure: MappedSensorItem[];
   }>({
-    hasFire: 0,
-    hasGas: 0,
+    hasFire: 1,
+    hasGas: 1,
     temperature: [],
     humidity: [],
     gasPressure: [],
     firePressure: [],
   }); // Initialize with an empty array
-  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const { socket, isConnected, error } = useWebSocket();
 
@@ -50,8 +47,8 @@ export default function StatsScreen() {
             const sensorData = JSON.parse(event.data.replace("SENSOR_DATA:", ""));
             setLiveData(prev => ({
               ...prev,
-              hasFire: sensorData.fire || 0,
-              hasGas: sensorData.gas || 0,
+              hasFire: sensorData.fire || 1,
+              hasGas: sensorData.gas || 1,
               temperature: [...prev.temperature, { value: sensorData.temperature, dataPointText: String(sensorData.temperature), label: new Date().toLocaleTimeString() }],
               humidity: [...prev.humidity, { value: sensorData.humidity, dataPointText: String(sensorData.humidity), label: new Date().toLocaleTimeString() }],
               gasPressure: [...prev.gasPressure, { value: sensorData.analog1, dataPointText: String(sensorData.analog1), label: new Date().toLocaleTimeString() }],
@@ -100,20 +97,21 @@ export default function StatsScreen() {
           <View
             style={{
               ...styles.announceContainer,
-              backgroundColor: liveData.hasFire ? "#ffb3b3" : "#b3ffb3",
-              borderColor: liveData.hasFire ? "#ff0000" : "#009900",
+              backgroundColor: liveData.hasFire === 0 || liveData.hasGas === 0 ? "#ffb3b3" : "#b3ffb3",
+              borderColor: liveData.hasFire === 0 || liveData.hasGas === 0 ? "#ff0000" : "#009900",
               borderWidth: 2,
               borderRadius: 12,
             }}
           >
             <Text
               style={{
-                color: liveData.hasFire ? "#ff0000" : "#009900",
+                color: liveData.hasFire === 0 || liveData.hasGas === 0 ? "#ff0000" : "#009900",
                 fontSize: 20,
                 fontWeight: "bold",
               }}
             >
-              {liveData.hasFire ? "🔥 Flame Detected!" : "✅ No Flame Detected"}
+              {liveData.hasFire === 0 ? "🔥 Flame Detected!" : "✅ No Flame Detected"}
+              {liveData.hasGas === 0 ? " 💨 Gas Detected!" : "✅ No Gas Detected"}
             </Text>
           </View>
           <View style={styles.chartContainer}>

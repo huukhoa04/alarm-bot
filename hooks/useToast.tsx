@@ -8,7 +8,7 @@ export function useToast() {
         type,
         text1: message,
         position: "top",
-        visibilityTime: 3000,
+        visibilityTime: 5000,
         autoHide: true,
         topOffset: offset,
         });
