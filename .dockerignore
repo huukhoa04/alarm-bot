@@ -5,6 +5,6 @@ npm-debug.log
 *.log
 .git
 .gitignore
-.env
+# .env
 .env.local
 app-example

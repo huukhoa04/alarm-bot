@@ -23,7 +23,7 @@ export default function ControlScreen() {
     disconnect,
   } = useWebSocket();
   const emptyLiveData = {
-    hasFire: 1,
+    hasFire: 0,
     hasGas: 1,
     temperature: [],
     humidity: [],
@@ -44,7 +44,7 @@ export default function ControlScreen() {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({
-    isFire: 1,
+    isFire: 0,
     hasGas: 1,
   });
   const [speed, setSpeed] = useState(100); // Example state for speed control
@@ -154,7 +154,7 @@ export default function ControlScreen() {
               firePressure: [...prev.firePressure, { value: sensorData.analog2, dataPointText: String(sensorData.analog2), label: new Date().toLocaleTimeString() }],
             }));
             setStatus({
-              isFire: sensorData.fire ?? 1,
+              isFire: sensorData.fire ?? 0,
               hasGas: sensorData.gas ?? 1,
             });
           } catch (e) {
@@ -165,11 +165,11 @@ export default function ControlScreen() {
     }
   }, [isConnected, socket, error]);
   useEffect(() => {
-    if(status.isFire == 0 && status.hasGas == 0) {
+    if(status.isFire == 1 && status.hasGas == 0) {
       toast.show("🔥💨 Flame and gas detected! Please take action immediately.", "error");
     }
     else
-    if(status.isFire == 0) {
+    if(status.isFire == 1) {
       toast.show("🔥 Flame detected! Please take action.", "error");
     }
     else if(status.hasGas == 0)
