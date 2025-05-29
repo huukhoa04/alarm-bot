@@ -23,8 +23,8 @@ export default function ControlScreen() {
     disconnect,
   } = useWebSocket();
   const emptyLiveData = {
-    hasFire: 0,
-    hasGas: 0,
+    hasFire: 1,
+    hasGas: 1,
     temperature: [],
     humidity: [],
     gasPressure: [],
@@ -44,8 +44,8 @@ export default function ControlScreen() {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({
-    isFire: 0,
-    hasGas: 0,
+    isFire: 1,
+    hasGas: 1,
   });
   const [speed, setSpeed] = useState(100); // Example state for speed control
   const router = useRouter();
@@ -67,13 +67,48 @@ export default function ControlScreen() {
 
   const controlEvent = useMemo(() => {
     return {
-      forward: () => sendMessage("w"),
-      back: () => sendMessage("s"),
-      left: () => sendMessage("a"),
-      right: () => sendMessage("d"),
-      stop: () => sendMessage("x"),
+      forward: () => {
+        if (!isConnected) {
+          console.log("Not connected, skipping forward command");
+          return;
+        }
+        console.log("Sending forward command (w)");
+        sendMessage("w");
+      },
+      back: () => {
+        if (!isConnected) {
+          console.log("Not connected, skipping back command");
+          return;
+        }
+        console.log("Sending back command (s)");
+        sendMessage("s");
+      },
+      left: () => {
+        if (!isConnected) {
+          console.log("Not connected, skipping left command");
+          return;
+        }
+        console.log("Sending left command (a)");
+        sendMessage("a");
+      },
+      right: () => {
+        if (!isConnected) {
+          console.log("Not connected, skipping right command");
+          return;
+        }
+        console.log("Sending right command (d)");
+        sendMessage("d");
+      },
+      stop: () => {
+        if (!isConnected) {
+          console.log("Not connected, skipping stop command");
+          return;
+        }
+        console.log("Sending stop command (x)");
+        sendMessage("x");
+      },
     };
-  }, [isConnected]);
+  }, [isConnected, sendMessage]);
   const addToSupabase = async () => {
     if (liveData.temperature.length === 0) {
       toast.show("No data to add to Supabase.", "info");
@@ -117,8 +152,8 @@ export default function ControlScreen() {
               firePressure: [...prev.firePressure, { value: sensorData.analog2, dataPointText: String(sensorData.analog2), label: new Date().toLocaleTimeString() }],
             }));
             setStatus({
-              isFire: sensorData.fire || 0,
-              hasGas: sensorData.gas || 0,
+              isFire: sensorData.fire || 1,
+              hasGas: sensorData.gas || 1,
             });
           } catch (e) {
             console.error("Error parsing sensor data:", e);
@@ -128,14 +163,14 @@ export default function ControlScreen() {
     }
   }, [isConnected, socket, error]);
   useEffect(() => {
-    if(status.isFire === 1 && status.hasGas === 1) {
+    if(status.isFire === 0 && status.hasGas === 0) {
       toast.show("🔥💨 Flame and gas detected! Please take action immediately.", "error");
     }
     else
-    if(status.isFire === 1) {
+    if(status.isFire === 0) {
       toast.show("🔥 Flame detected! Please take action.", "error");
     }
-    else if(status.hasGas === 1)
+    else if(status.hasGas === 0)
     {
       toast.show("💨 Gas detected! Please take action.", "error");
     }
@@ -195,7 +230,7 @@ export default function ControlScreen() {
               marginBottom: 16,
             }}
           >
-            HOLD the buttons to control the mini car
+            HOLD buttons to control robot (anti-spam protection)
           </Text>
           <ControlPanel controlEvent={controlEvent} />
         </>
