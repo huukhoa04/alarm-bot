@@ -874,8 +874,8 @@ void reTrai() {
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, LOW);
 
-  ledcWrite(ENA, TOC_DO);
-  ledcWrite(ENB, TOC_DO);
+  ledcWrite(ENA, 200);
+  ledcWrite(ENB, 200);
 
   if (xSemaphoreTake(statusMutex, 100 / portTICK_PERIOD_MS)) {
     currentStatus = "curve_left";
@@ -893,8 +893,8 @@ void rePhai() {
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
 
-  ledcWrite(ENA, TOC_DO);
-  ledcWrite(ENB, TOC_DO);
+  ledcWrite(ENA, 200);
+  ledcWrite(ENB, 200);
 
   if (xSemaphoreTake(statusMutex, 100 / portTICK_PERIOD_MS)) {
     currentStatus = "curve_right";
